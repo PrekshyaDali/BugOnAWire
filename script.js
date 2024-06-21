@@ -1,19 +1,34 @@
 const canvas = document.getElementById('gameCanvas');
-
 const ctx = canvas.getContext('2d');
-
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
 
-const wireXPositions = [150, 300, 450, 600];
-const wireCount = wireXPositions.length;
+const wireYPositions = [150, 300, 450, 600]; // Positions for horizontal wires
+const wireCount = wireYPositions.length;
+
+const bugImage = new Image();
+bugImage.src = './bug.png';
+
+const fenceImage = new Image();
+fenceImage.src = './fence.png'
+
+const spriteSheetWidth = 612;
+const spriteSheetHeight = 408;
+const bugFrameWidth = spriteSheetWidth / 3;
+const bugFrameHeight = spriteSheetHeight / 2;
+const totalBugFrames = 6;
+let bugCurrentFrame = 0;
+let frameCount = 0;
+
+
 
 let bug = {
-    x: wireXPositions[0],
-    y: canvasHeight / 2,
-    width: 20,
-    height: 20,
-    color: 'green',
+    x: canvasWidth / 6, // x axis of the start of the bug
+    y: wireYPositions[0] + 70, 
+    // width: bugFrameWidth,
+    width: 80,
+    // height: bugFrameHeight,
+    height: 80,
     wireIndex: 0
 };
 
@@ -22,42 +37,61 @@ let score = 0;
 let gameOver = false;
 
 function drawBug() {
-    ctx.fillStyle = bug.color;
-    ctx.fillRect(bug.x, bug.y, bug.width, bug.height);
+    const row = Math.floor(bugCurrentFrame / 3);
+    const col = bugCurrentFrame % 3;
+    ctx.drawImage(
+        bugImage,
+        col * bugFrameWidth, row * bugFrameHeight, // Source x, y
+        bugFrameWidth, bugFrameHeight, // Source width, height
+        bug.x, bug.y, // Destination x, y
+        bug.width, bug.height // Destination width, height
+    );
+
+    // Update frame count and switch frame if needed
+    frameCount++;
+    if (frameCount % 10 === 0) { // Change frame every 10 game loops
+        bugCurrentFrame = (bugCurrentFrame + 1) % totalBugFrames;
+    }
 }
 
 function drawWires() {
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 5;
-    wireXPositions.forEach(x => {
+    wireYPositions.forEach(y => {
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvasHeight);
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvasWidth, y);
         ctx.stroke();
     });
 }
 
 function drawObstacles() {
     obstacles.forEach(obstacle => {
-        ctx.fillStyle = 'red';
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+        // ctx.fillStyle = 'red';
+        // ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+
+        ctx.drawImage(
+            fenceImage,
+            obstacle.x, obstacle.y,
+            obstacle.width, obstacle.height
+        )
     });
 }
 
 function moveObstacles() {
-    obstacles = obstacles.filter(obstacle => obstacle.y + obstacle.height > 0);
+    obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0); // Remove obstacles that have moved past the canvas
     obstacles.forEach(obstacle => {
-        obstacle.y += 5;
+        obstacle.x -= 5; // Move obstacles to the left (change to positive value to move right)
     });
 }
 
 function createObstacle() {
     const wireIndex = Math.floor(Math.random() * wireCount);
     const obstacle = {
-        x: wireXPositions[wireIndex],
-        y: 0,
-        width: 20,
-        height: 20,
+        x: canvasWidth, // Start obstacles from the right side of the canvas
+        y: wireYPositions[wireIndex],
+        width: bugFrameWidth - 20,
+        height: bugFrameHeight -20,
     };
     obstacles.push(obstacle);
 }
@@ -98,18 +132,21 @@ function gameLoop() {
 
 setInterval(createObstacle, 2000);
 
+// event listening to up and down 
 document.addEventListener('keydown', (event) => {
-    if (event.code === 'ArrowUp' && bug.y > 0) {
-        bug.y -= 20;
-    } else if (event.code === 'ArrowDown' && bug.y + bug.height < canvasHeight) {
-        bug.y += 20;
-    } else if (event.code === 'ArrowLeft' && bug.wireIndex > 0) {
+    const wireHeightDifference = wireYPositions[1] - wireYPositions[0];
+    const bugVerticalOffset = (wireHeightDifference - bug.height) ;
+
+    if (event.code === 'ArrowUp' && bug.wireIndex > 0) {
         bug.wireIndex -= 1;
-        bug.x = wireXPositions[bug.wireIndex];
-    } else if (event.code === 'ArrowRight' && bug.wireIndex < wireCount - 1) {
+        bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset;
+    } else if (event.code === 'ArrowDown' && bug.wireIndex < wireCount - 1) {
         bug.wireIndex += 1;
-        bug.x = wireXPositions[bug.wireIndex];
+        bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset;
     }
 });
 
-gameLoop();
+bugImage.onload = function () {
+    gameLoop();
+};
+
