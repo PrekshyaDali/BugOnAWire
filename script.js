@@ -18,7 +18,7 @@ const backgroundMusic = new Audio('./bgm.mp3')
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.5;
 // backgroundMusic.play();
-const clashMusic = new Audio ('./clash.wav')
+const clashMusic = new Audio('./clash.wav')
 
 // for the bug
 const spriteSheetWidth = 612;
@@ -58,6 +58,8 @@ let bug = {
 let obstacles = [];
 let score = 0;
 let gameOver = false;
+let highScore = localStorage.getItem('highScore') || 0
+
 
 function drawBug() {
     const row = Math.floor(bugCurrentFrame / 3);
@@ -127,7 +129,6 @@ function createObstacle() {
     };
     obstacles.push(obstacle);
 }
-let highScore = localStorage.getItem('highScore') || 0
 
 // to check the collison
 function checkCollision() {
@@ -198,7 +199,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-bugImage.onload = function(){
+bugImage.onload = function () {
     backgroundMusic.play();
     gameLoop()
 }
@@ -248,6 +249,11 @@ document.addEventListener('keydown', (event) => {
 // to show the gameover modal
 function showGameOverModal() {
     document.getElementById('finalScore').innerText = "Score: " + score;
+    if (
+        score > highScore
+    ) {
+        document.getElementById('congrats').innerText = "Congrats, you have achieved new highscore"
+    }
     document.getElementById('game-modal').style.display = "block";
 }
 
@@ -270,4 +276,5 @@ document.querySelector('.close').addEventListener('click', function () {
 
 bugImage.onload = function () {
     gameLoop();
+    updateScore();
 };
