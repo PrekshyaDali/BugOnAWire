@@ -2,6 +2,7 @@ const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const canvasWidth = canvas.width;
 const canvasHeight = canvas.height;
+console.log(canvasWidth)
 
 const wireYPositions = [150, 300, 450, 600];
 const wireCount = wireYPositions.length;
@@ -11,6 +12,13 @@ bugImage.src = './bug.png';
 
 const birdImage = new Image();
 birdImage.src = './catrunning.png';
+
+// to play the background music
+const backgroundMusic = new Audio('./bgm.mp3')
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.5;
+// backgroundMusic.play();
+const clashMusic = new Audio('./clash.wav')
 
 // for the bug
 const spriteSheetWidth = 612;
@@ -31,11 +39,11 @@ let catCurrentFrame = 0;
 let catFrameCount = 0;
 
 // Calculating vertical offset for bug starting position
-const bugVerticalOffset = (wireYPositions[1] - wireYPositions[0]) / 1.5; 
+const bugVerticalOffset = (wireYPositions[1] - wireYPositions[0]) / 1.5;
 
 let bug = {
-    x: canvasWidth / 6,   
-    y: wireYPositions[0] + bugVerticalOffset - bugFrameHeight, 
+    x: canvasWidth / 6,
+    y: wireYPositions[0] + bugVerticalOffset - bugFrameHeight,
     width: 100,
     height: 100,
     wireIndex: 0,
@@ -50,6 +58,8 @@ let bug = {
 let obstacles = [];
 let score = 0;
 let gameOver = false;
+let highScore = localStorage.getItem('highScore') || 0
+
 
 function drawBug() {
     const row = Math.floor(bugCurrentFrame / 3);
@@ -102,12 +112,13 @@ function moveObstacles() {
     obstacles.forEach((obstacle, index) => {
         obstacle.x -= 5;
         if (obstacle.x + obstacle.width < 0) {
-            obstacles.splice(index, 1); 
-            score++; 
+            obstacles.splice(index, 1);
+            score += 2;
         }
     });
 }
 
+// to create the obstacle
 function createObstacle() {
     const wireIndex = Math.floor(Math.random() * wireCount);
     const obstacle = {
@@ -119,6 +130,7 @@ function createObstacle() {
     obstacles.push(obstacle);
 }
 
+// to check the collison
 function checkCollision() {
     for (let obstacle of obstacles) {
         let bugLeft = bug.x;
@@ -139,10 +151,17 @@ function checkCollision() {
         ) {
             // Collision detected
             gameOver = true;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore)
+
+            }
+            showGameOverModal()
             return;
         }
     }
 }
+
 
 function drawScore() {
     ctx.font = "20px Arial";
@@ -150,20 +169,24 @@ function drawScore() {
     ctx.fillText("Score: " + score, 10, 30);
 }
 
+function updateScore() {
+    document.getElementById('highScore').innerText = highScore;
+}
+
 function gameLoop() {
     if (gameOver) {
-        ctx.font = "30px Arial";
+        ctx.font = "30px Arial"
         ctx.fillText("Game Over! Score: " + score, canvasWidth / 4, canvasHeight / 2);
         return;
     }
-
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
     drawWires();
 
     if (bug.isJumping) {
-        handleJump(); 
+        handleJump();
     } else {
-        drawBug(); 
+        drawBug();
         if (bug.y !== wireYPositions[bug.wireIndex] + bugVerticalOffset - bugFrameHeight) {
             bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset - bugFrameHeight;
         }
@@ -176,10 +199,15 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
+bugImage.onload = function () {
+    backgroundMusic.play();
+    gameLoop()
+}
+
 setInterval(createObstacle, 2000);
 function handleJump() {
     if (bug.isJumping) {
-   
+
         bug.y -= bug.jumpSpeed;
         bug.jumpCount += bug.jumpSpeed;
 
@@ -199,9 +227,11 @@ function handleJump() {
         }
     }
 
-    drawBug(); 
+    drawBug();
 }
 
+
+// the eventlisteners for the arrowup , down and space
 document.addEventListener('keydown', (event) => {
     if (event.code === 'ArrowUp' && bug.wireIndex > 0) {
         bug.wireIndex -= 1;
@@ -216,7 +246,35 @@ document.addEventListener('keydown', (event) => {
 
     console.log(`Wire Index: ${bug.wireIndex}, Bug Y: ${bug.y}`);
 });
+// to show the gameover modal
+function showGameOverModal() {
+    document.getElementById('finalScore').innerText = "Score: " + score;
+    if (
+        score > highScore
+    ) {
+        document.getElementById('congrats').innerText = "Congrats, you have achieved new highscore"
+    }
+    document.getElementById('game-modal').style.display = "block";
+}
+
+document.getElementById('restartButton').addEventListener('click', function () {
+    gameOver = false;
+    score = 0;
+    bug.wireIndex = 0;
+    bug.y = wireYPositions[0] + bugVerticalOffset - bugFrameHeight;
+    bug.isJumping = false;
+    bug.jumpCount = 0;
+    obstacles = [];
+    document.getElementById('game-modal').style.display = "none";
+    updateScore();
+    gameLoop();
+});
+
+document.querySelector('.close').addEventListener('click', function () {
+    document.getElementById('game-Modal').style.display = "none";
+});
 
 bugImage.onload = function () {
     gameLoop();
+    updateScore();
 };

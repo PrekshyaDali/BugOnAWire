@@ -6,6 +6,7 @@ body {
     margin: 0;
     background-image: url('./backgroundimg.jpg');
     background-size: cover;
+    position: relative;
 
 }
 
@@ -13,4 +14,43 @@ canvas {
     border: 2px solid gray;
     box-shadow: 10px 10px 10px 2px rgba(0, 0, 0, 0.02);
     background-color: transparent;
+}
+
+#left-board {
+    /* border-radius: 20px; */
+    /* box-shadow: rgba(0, 0, 0, 0.02); */
+    /* height: 550px; */
+    background-color: white;
+    padding: 20px;
+    /* color:white */
+
+}
+
+#game-modal {
+    background-color: skyblue;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    position: absolute;
+    top: 200px;
+    left: 700px;
+    display: none;
+    z-index: 1000; 
+
+
+}
+
+button {
+    padding: 12px;
+    background-color: greenyellow;
+    border: none;
+    border-radius: 10px;
+    color: darkblue;
+
+
+}
+
+button:hover {
+    background-color: brown;
+    color: white
 }
