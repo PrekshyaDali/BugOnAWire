@@ -9,14 +9,14 @@
 </head>
 
 <body>
-
+    <audio src="./bgm.mp3" id='backgroundMusic' loop autoplay></audio>
     <div id='left-board' style='margin-right: 20px'>
         <h1 style="color: skyblue;">Game Information</h1>
         <h3>Directions</h3>
         <ul>
             <li>Use Arrow Up to move up</li>
             <li>Use Arrow Down to move down</li>
-            <li>Use Space to jump</li>
+            <li>Press 'M' key to mute the background Music</li>
         </ul>
         <img src='./keys.png' style=' width: 300px; height: 300px;'>
         </h1>
@@ -25,14 +25,16 @@
     </div>
     <canvas id="gameCanvas" width="800" height="600"></canvas>
 
-
     <div id='game-modal'>
         <div class='modal-content'>
-            <span class="close">&times;</span>
-            <h2>Game Over</h2>
+
+            <div style = 'display:flex; justify-content: center;'>
+                <h2 style = "color:rgb(80, 128, 150)">Game Over</h2>
+
+            </div>
             <p>Press the button 'Restart game' to restart the game</p>
             <p id="finalScore">Score: 0</p>
-            <p id = "congrats"></p>
+            <p id="congrats"></p>
             <div style="display: flex; justify-content: center;">
                 <button id="restartButton">Restart Game</button>
 
