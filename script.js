@@ -1,3 +1,4 @@
+window.onload = function (){
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const canvasWidth = canvas.width;
@@ -14,6 +15,7 @@ birdImage.src = './catrunning.png';
 const clashMusic = new Audio('./clash.wav');
 const backgroundMusic = document.getElementById('backgroundMusic');
 let isbackgroundMusicPlaying = true;
+backgroundMusic.currentTime = 0;
 
 const updownMusic = new Audio('./updown.wav')
 updownMusic.speed = 0.2
@@ -239,6 +241,7 @@ function gameLoop() {
     drawObstacles();
     checkCollision();
     drawScore();
+    backgroundMusic.play();
     requestAnimationFrame(gameLoop);
 }
 
@@ -282,3 +285,4 @@ function showGameOverModal() {
 
 updateScore();
 gameLoop();
+}
