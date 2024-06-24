@@ -11,13 +11,26 @@ bugImage.src = './bug.png';
 
 const birdImage = new Image();
 birdImage.src = './catrunning.png';
-
-// to play the background music
-const backgroundMusic = new Audio('./bgm.mp3');
-backgroundMusic.loop = true;
-backgroundMusic.volume = 0.5;
-
 const clashMusic = new Audio('./clash.wav');
+const backgroundMusic = document.getElementById('backgroundMusic');
+let isbackgroundMusicPlaying = true;
+
+// Pressing the M key to mute the background
+function toggleBackgroundMusic() {
+    if (isBackgroundMusicPlaying) {
+        backgroundMusic.pause(); // Pause the music
+    } else {
+        backgroundMusic.play(); // Play the music
+    }
+    isbackgroundMusicPlaying = !isBackgroundMusicPlaying; // Toggle the boolean
+}
+
+document.addEventListener('keydown', (event) => {
+    if (event.code === 'KeyM') {
+        toggleBackgroundMusic();
+    }
+});
+
 
 // for the bug
 const spriteSheetWidth = 612;
@@ -154,6 +167,7 @@ function moveObstacles() {
 
 function createObstacle() {
     const wireIndex = Math.floor(Math.random() * wireCount);
+    console.log(wireIndex)
     const obstacle = {
         x: canvasWidth,
         y: wireYPositions[wireIndex] + 70,
@@ -190,6 +204,7 @@ function checkCollision() {
                 highScore = score;
                 localStorage.setItem('highScore', highScore);
             }
+            clashMusic.play()
             showGameOverModal();
             return;
         }
@@ -202,18 +217,16 @@ function drawScore() {
     ctx.fillText("Score: " + score, 10, 30);
 }
 
+
 function updateScore() {
     document.getElementById('highScore').innerText = highScore;
 }
 
 function gameLoop() {
     if (gameOver) {
-        ctx.font = "30px Arial";
-        ctx.fillText("Game Over! Score: " + score, canvasWidth / 4, canvasHeight / 2);
         return;
     }
     ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-
     drawWires();
     drawBug()
     moveObstacles();
@@ -223,7 +236,7 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// Event listeners for bug movement
+// Event listeners for dog movement
 document.addEventListener('keydown', (event) => {
     if (event.code === 'ArrowUp' && bug.wireIndex > 0) {
         bug.wireIndex -= 1;
@@ -231,7 +244,7 @@ document.addEventListener('keydown', (event) => {
     } else if (event.code === 'ArrowDown' && bug.wireIndex < wireCount - 1) {
         bug.wireIndex += 1;
         bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset - bugFrameHeight;
-    } 
+    }
 });
 
 // Restart button functionality
@@ -248,12 +261,7 @@ document.getElementById('restartButton').addEventListener('click', function () {
     gameLoop();
 });
 
-// Close modal button functionality
-document.querySelector('.close').addEventListener('click', function () {
-    document.getElementById('game-modal').style.display = "none";
-});
-
-// Modal display function
+// Modal display for the gameover
 function showGameOverModal() {
     document.getElementById('finalScore').innerText = "Score: " + score;
     if (score > highScore) {
@@ -262,6 +270,5 @@ function showGameOverModal() {
     document.getElementById('game-modal').style.display = "block";
 }
 
-// Initialize game loop and update score
 updateScore();
 gameLoop();
