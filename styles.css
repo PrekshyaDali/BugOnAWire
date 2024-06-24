@@ -1,3 +1,9 @@
+
+@font-face {
+    font-family: 'BruceForever';
+    src: url('./BruceForeverRegular-X3jd2.ttf');
+}
+
 body {
     display: flex;
     justify-content: center;
@@ -7,6 +13,8 @@ body {
     background-image: url('./backgroundimg.jpg');
     background-size: cover;
     position: relative;
+    font-size: small;
+    font-family: 'BruceForever', sans-serif;
 
 }
 
@@ -54,3 +62,4 @@ button:hover {
     background-color: brown;
     color: white
 }
+
