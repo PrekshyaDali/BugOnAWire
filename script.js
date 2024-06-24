@@ -15,6 +15,10 @@ const clashMusic = new Audio('./clash.wav');
 const backgroundMusic = document.getElementById('backgroundMusic');
 let isbackgroundMusicPlaying = true;
 
+const updownMusic = new Audio('./updown.wav')
+updownMusic.speed = 0.2
+updownMusic.load()
+
 // Pressing the M key to mute the background
 function toggleBackgroundMusic() {
     if (isBackgroundMusicPlaying) {
@@ -69,10 +73,10 @@ let highScore = localStorage.getItem('highScore') || 0;
 const levels = [
     { scoreThreshold: 0, speed: 5, obstacleInterval: 1500 },
     { scoreThreshold: 10, speed: 6, obstacleInterval: 1000 },
-    { scoreThreshold: 20, speed: 7, obstacleInterval: 500 },
-    { scoreThreshold: 30, speed: 8, obstacleInterval: 300 },
-    { scoreThreshold: 40, speed: 9, obstacleInterval: 200 },
-    { scoreThreshold: 50, speed: 10, obstacleInterval: 100 },
+    { scoreThreshold: 20, speed: 7, obstacleInterval: 800 },
+    { scoreThreshold: 30, speed: 8, obstacleInterval: 500 },
+    { scoreThreshold: 40, speed: 9, obstacleInterval: 400 },
+    { scoreThreshold: 50, speed: 10, obstacleInterval: 200 },
 ];
 
 function getObstacleSpeed() {
@@ -127,6 +131,18 @@ function drawWires() {
     });
 }
 
+function createObstacle() {
+    const wireIndex = Math.floor(Math.random() * wireCount);
+    console.log(wireIndex)
+    const obstacle = {
+        x: canvasWidth,
+        y: wireYPositions[wireIndex] + 70,
+        width: 100,
+        height: 80
+    };
+    obstacles.push(obstacle);
+}
+
 function drawObstacles() {
     obstacles.forEach(obstacle => {
         const rowBird = Math.floor(catCurrentFrame / 2);
@@ -165,18 +181,7 @@ function moveObstacles() {
     }
 }
 
-function createObstacle() {
-    const wireIndex = Math.floor(Math.random() * wireCount);
-    console.log(wireIndex)
-    const obstacle = {
-        x: canvasWidth,
-        y: wireYPositions[wireIndex] + 70,
-        width: 100,
-        height: 80
-    };
-    obstacles.push(obstacle);
-}
-
+// check collison
 function checkCollision() {
     for (let obstacle of obstacles) {
         // Bug's bounding box
@@ -211,12 +216,13 @@ function checkCollision() {
     }
 }
 
+
+
 function drawScore() {
     ctx.font = "20px Arial";
     ctx.fillStyle = "black";
     ctx.fillText("Score: " + score, 10, 30);
 }
-
 
 function updateScore() {
     document.getElementById('highScore').innerText = highScore;
@@ -239,9 +245,13 @@ function gameLoop() {
 // Event listeners for dog movement
 document.addEventListener('keydown', (event) => {
     if (event.code === 'ArrowUp' && bug.wireIndex > 0) {
+        updownMusic.play()
+        updownMusic.currentTime = 0;  
         bug.wireIndex -= 1;
         bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset - bugFrameHeight;
     } else if (event.code === 'ArrowDown' && bug.wireIndex < wireCount - 1) {
+        updownMusic.play()
+        updownMusic.currentTime = 0;  
         bug.wireIndex += 1;
         bug.y = wireYPositions[bug.wireIndex] + bugVerticalOffset - bugFrameHeight;
     }
