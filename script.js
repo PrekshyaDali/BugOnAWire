@@ -21,23 +21,6 @@ const updownMusic = new Audio('./updown.wav')
 updownMusic.speed = 0.2
 updownMusic.load()
 
-// Pressing the M key to mute the background
-function toggleBackgroundMusic() {
-    if (isBackgroundMusicPlaying) {
-        backgroundMusic.pause(); // Pause the music
-    } else {
-        backgroundMusic.play(); // Play the music
-    }
-    isbackgroundMusicPlaying = !isBackgroundMusicPlaying; // Toggle the boolean
-}
-
-document.addEventListener('keydown', (event) => {
-    if (event.code === 'KeyM') {
-        toggleBackgroundMusic();
-    }
-});
-
-
 // for the bug
 const spriteSheetWidth = 612;
 const spriteSheetHeight = 408;
